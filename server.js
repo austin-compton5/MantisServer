@@ -4,6 +4,7 @@ const { json } = require('express/lib/response')
 const db = require('./db')
 const parser = require('body-parser')
 const cors = require('cors')
+const { resourceLimits } = require('worker_threads')
 
 const app = express()
 const port  = process.env.PORT || "5001"
@@ -29,25 +30,31 @@ app.post("/newuser", async (req, res) => {
     try{
         let {username, password, email} = {username : req.body.username, password : req.body.password, email : req.body.email }
         let insert = await db.query(`INSERT INTO USERS(username, email, password) values ('${username}', '${email}', '${password}')`)
-        let result = await db.query(`SELECT * FROM USERS WHERE email = '${email}' AND password = '${password}' AND email = '${email}'`)
+        let result = await db.query(`SELECT * FROM USERS WHERE email = '${email}' AND password = '${password}' AND username = '${username}'`)
+        console.log(result)
         res.status(200).json({
             status: "success",
             user: result.rows[0]
         })
     }
     catch(e){
-            res.status(400).json("unable to register user: registration requirements likely not met or user is already registered")
+        res.status(400).json("unable to register user: field requirements likely not met or user is already registered")
     }
     
 });
 
-app.get("/signin", async (req, res) => {
-    let {email, password} = {email: req.body.email, password : req.body.password}
-    let result = await db.query(`SELECT * FROM USERS WHERE email = '${email}' AND password = '${password}'`)
-    res.status(200).json({
-        status : "success",
-        user: result.rows[0],
-    })
+app.post("/signin", async (req, res) => {
+    try{
+        let {email, password} = {email: req.body.email, password : req.body.password}
+        let result = await db.query(`SELECT * FROM USERS WHERE email = '${email}' AND password = '${password}'`)
+        res.status(200).json({
+            status : "success",
+            user: result.rows[0]
+        })
+    }
+    catch(e){
+        res.status(400).json("user is not registered")
+    }   
 })
 
 
