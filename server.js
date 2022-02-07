@@ -80,6 +80,34 @@ app.post("/bookmark", async (req, res)=> {
     }
 })
 
+app.post("/deletebookmark", async (req, res) => {
+    try {
+        let {username, projectname} = {
+            username : req.body.username,
+            projectname : req.body.projectname
+        }
+        let deletedProject = await db.query(`DELETE FROM ${username} WHERE projectname = '${projectname}'`)
+        console.log(deletedProject)
+        res.status(200).json({
+            status: "success"
+        })
+    }catch(e){
+        console.log(e)
+    }
+})
 
+app.post("/getbookmarked", async (req, res) => {
+    try {
+        let userTable = req.body.username
+        let favoritedProjects = await db.query(`SELECT * FROM ${userTable}`)
+        console.log(favoritedProjects.rows)
+        res.status(200).json({
+            status: "success",
+            favoritedProjects: favoritedProjects.rows
+        })
+    }catch(e){
+        console.log(e)
+    }
+})
 
 app.listen(port, console.log(`app is running on port ${port}`))
