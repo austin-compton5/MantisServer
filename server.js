@@ -66,9 +66,9 @@ app.post("/bookmark", async (req, res)=> {
         username : req.body.username.trim(),
         projectname : req.body.projectname.trim(),
         platform:req.body.platform.trim(),
-        discord : req.body.discord == undefined ? '' : req.body.discord.trim(),
-        website : req.body.website == undefined ? '' : req.body.website.trim(),
-        twitter: req.body.twitter == undefined ? '' : req.body.twitter.trim()
+        discord : req.body.discord == 'none' ? 'none' : req.body.discord.trim(),
+        website : req.body.website == 'none' ? 'none' : req.body.website.trim(),
+        twitter: req.body.twitter == 'none' ? 'none' : req.body.twitter.trim()
      }
      let newproject = await db.query(`INSERT INTO ${username}(projectname, platform, discord, website, twitter) values ('${projectname}', '${platform}', '${discord}', '${website}', '${twitter}')`)
      console.log(newproject)
