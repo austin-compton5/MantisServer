@@ -28,7 +28,8 @@ function authenticateRegistration(userName, password, email){
 
 app.post("/newuser", async (req, res) => {
     try{
-        let {username, password, email} = {username : req.body.username, password : req.body.password, email : req.body.email }
+      let {username, password, email} = {username : req.body.username, password : req.body.password, email : req.body.email }
+      if(authenticateRegistration(username, password, email) == true){
         let insert = await db.query(`INSERT INTO USERS(username, email, password) values ('${username}', '${email}', '${password}')`)
         let result = await db.query(`SELECT * FROM USERS WHERE email = '${email}' AND password = '${password}' AND username = '${username}'`)
         let projectTable = await db.query(`CREATE TABLE ${username}(ID SERIAL PRIMARY KEY, PROJECTNAME TEXT NOT NULL UNIQUE, PLATFORM TEXT NOT NULL, DISCORD TEXT, WEBSITE TEXT, TWITTER TEXT);`)
@@ -36,10 +37,13 @@ app.post("/newuser", async (req, res) => {
         res.status(200).json({
             status: "success",
             user: result.rows[0]
-        })
+          })
+        }else{
+            res.status(400).json('unable to register user: field requirements likely not met')
+        }
     }
     catch(e){
-        res.status(400).json("unable to register user: field requirements likely not met or user is already registered")
+        res.status(400).json("unable to register user: server may have encountered a problem or user is already registered")
     }
     
 });
